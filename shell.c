@@ -3,12 +3,12 @@
 int main(void)
 {
 
-  char* command;
+  char command[50];
 
   while(1)
     {
       printf("sish:> ");
-      
+      fgets(command, 50, stdin);
       
 
 
@@ -18,4 +18,4 @@ int main(void)
 
 
   return 0;
-}//sasdadadfad
+}
