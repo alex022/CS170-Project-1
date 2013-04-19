@@ -3,12 +3,12 @@
 int main(void)
 {
 
-  char command[50];
+  char command[20];
 
   while(1)
     {
       printf("sish:> ");
-      fgets(command, 50, stdin);
+      fgets(command, 20, stdin);
       
 
 
