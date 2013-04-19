@@ -2,20 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CLENGTH 1024
+
 int main(void)
 {
-	char command[20];
+	char input[CLENGTH];
 
   	while(1)
-    {
+       {
       	printf("sish:> ");
-      	fgets(command, 20, stdin);
+      	fgets(input, CLENGTH, stdin);
+	input[strlen(input)-1] = '\0';
+
       
-      	if(strncmp(command, "exit", 4) == 0)
-			break;
+      	if(strcmp(input, "exit") == 0)
+	  break;
 
 
-      	printf("\n");
+       
     }
 
   return 0;
