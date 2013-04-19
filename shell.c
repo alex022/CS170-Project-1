@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(void)
 {
@@ -13,7 +14,7 @@ int main(void)
       
       
 
-      if(strcmp(command, "exit")==0)
+      if(strncmp(command, "exit", 4)==0)
 	break;
 
 
