@@ -4,23 +4,19 @@
 
 int main(void)
 {
+	char command[20];
 
-  char command[20];
-
-  while(1)
+  	while(1)
     {
-      printf("sish:> ");
-      fgets(command, 20, stdin);
+      	printf("sish:> ");
+      	fgets(command, 20, stdin);
       
-      
-
-      if(strncmp(command, "exit", 4)==0)
-	break;
+      	if(strncmp(command, "exit", 4) == 0)
+			break;
 
 
-      printf("\n");
+      	printf("\n");
     }
-
 
   return 0;
 }
