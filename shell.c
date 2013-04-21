@@ -23,8 +23,10 @@ int main(void)
     	if(strcmp(input, "exit") == 0)
 	  			break;
 
-		if(strcmp(input, "lm") == 0)
+	if(strcmp(input, "lm") == 0){
 			printf("ERROR: exec failed\n");
+			continue;
+	}
 
 		system(input); //Works for the most part and is extremely convenient, but we need 					   //to deal with spaces and output adjustments. Hope the prof lets 						   //us use this function.
     }
