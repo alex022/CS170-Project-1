@@ -4,11 +4,18 @@
 
 #define CLENGTH 1024
 
+int argCount(char*);
+void parse(char*, int, char**);
+
 int main(void)
 {
 	char input[CLENGTH];
-	char command[5] = "";
+	char command[CLENGTH];
+	char pipe[100][100];
+	char* path = "/bin/";
 	char* split;
+
+	int comNum = 0;
 
 	while(1)
 	{
@@ -16,20 +23,84 @@ int main(void)
 		fgets(input, CLENGTH, stdin);
 		input[strlen(input)-1] = '\0';
 
-		//split = strtok(input, " ");
-		//if(split != NULL)
-			//strcpy(command, split);
+		split = strtok(input, "|");
+		while(1)
+		{
+			if(split != NULL)
+			{
+				comNum++;
+				strcpy(pipe[comNum], split);
+				split = strtok(NULL, "|");
+			}
+			else
+				break;
+		}
+
+		int pid = fork(); //If pid != 0, then parent process. Else, child process
+
+		if(pid == 0)
+		{
+			int num_args = argCount(input);
+			char* args[num_args+1];
+			parse(input, num_args, args);
+			args[num_args] = NULL;
+			
+			strcpy(command, path);
+			strcat(command, args[0]);
+			int rv = execv(command, args);
+		}
+		else
+			wait(); //Parent process
 
     	if(strcmp(input, "exit") == 0)
-	  			break;
+	  		break;
 
-	if(strcmp(input, "lm") == 0){
+		if(strcmp(input, "lm") == 0){
 			printf("ERROR: exec failed\n");
 			continue;
 	}
 
-		system(input); //Works for the most part and is extremely convenient, but we need 					   //to deal with spaces and output adjustments. Hope the prof lets 						   //us use this function.
     }
 
   return 0;
 }
+
+int argCount(char buffer[])
+{
+	int args = 0;
+	char* token;
+	
+	token = strtok(buffer," ");
+	while(1)
+	{
+		if(token != NULL)
+		{
+			args++;
+			token = strtok(NULL, " ");
+		}
+		else
+			break;
+	}
+	return args;
+}
+
+void parse(char in[], int argNum, char* arguments[])
+{
+	char* token;
+	int i;
+	char buffer[512];
+
+	token = strtok(in," ");
+	for(i = 0; i < argNum; i++)
+	{
+		if(token != NULL)
+		{
+			strcpy(buffer, in);
+			arguments[i] = buffer;
+			token = strtok(NULL, " ");
+		}
+	}
+}
+
+
+
