@@ -15,6 +15,8 @@ int main(void)
   char pipe[100][100]; 
   char* split;
   
+  int i, k;
+
   int comNum = 0;
   
   while(1)
@@ -22,20 +24,16 @@ int main(void)
       printf("sish:> ");
       fgets(input, CLENGTH, stdin);
       input[strlen(input)-1] = '\0';
-	  
-      /* split = strtok(input, "|");
-	 while(1)
-	 {
-	 if(split != NULL)
-	 {
-	 comNum++;
-	 strcpy(pipe[comNum], split);
-	 split = strtok(NULL, "|");
-	 }
-	 else
-	 break;
-	 }*/
+      
+      if(strcmp(input ,"exit")==0)
+	    exit(0);
 
+      if(feof(stdin))
+	{
+	  printf("\n");
+	  break;
+	}
+      
       int pid = fork(); //If pid != 0, then parent process. Else, child process
 	  
       if(pid == 0)
@@ -44,25 +42,32 @@ int main(void)
 	  char** args = malloc(((num_args+1)*sizeof(char*)));
 
 	  parse(input, args);
-	  int k = 0;
+	 
 	  args[num_args] = NULL;
 	  
+	if(strcmp(args[0], "cd")==0)
+	  {
+	    char cwd[1024];
+	    if(getcwd(cwd, sizeof(cwd)) != NULL)
+	      {
+		strcat(cwd, "/");
+		strcat(cwd, args[1]);		
+		chdir(cwd);  		
+	      }
+	    continue;
+	  }
+
 	  char* command = malloc(strlen(args[0]+strlen(path))*sizeof(char*));
 	  command = strcat(strcpy(command, path), args[0]);
 	  int rv = execv(command, args);
+	  
+	    if(rv == -1)
+	     printf("ERROR: Exec failed.\n");
 	}
       else
 	wait(NULL); //Parent process
 	  
-      if(strcmp(input, "exit") == 0)
-	break;
-	  
-      if(strcmp(input, "lm") == 0){
-	printf("ERROR: exec failed\n");
-	continue;
       }
-	  
-    }
 	
   return 0;
 }
