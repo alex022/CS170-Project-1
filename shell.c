@@ -26,7 +26,7 @@ int main(void)
       input[strlen(input)-1] = '\0';
       
       if(strcmp(input ,"exit")==0)
-	    exit(0);
+	exit(0);
 
       if(feof(stdin))
 	{
@@ -47,12 +47,12 @@ int main(void)
 	  
 	if(strcmp(args[0], "cd")==0)
 	  {
-	    char cwd[1024];
-	    if(getcwd(cwd, sizeof(cwd)) != NULL)
+	    char curdir[CLENGTH];
+	    if(getcwd(curdir, sizeof(curdir)) != NULL)
 	      {
-		strcat(cwd, "/");
-		strcat(cwd, args[1]);		
-		chdir(cwd);  		
+		strcat(curdir, "/");
+		strcat(curdir, args[1]);		
+		chdir(curdir);  		
 	      }
 	    continue;
 	  }
@@ -62,7 +62,13 @@ int main(void)
 	  int rv = execv(command, args);
 	  
 	    if(rv == -1)
-	     printf("ERROR: Exec failed.\n");
+	      {
+		printf("ERROR: Exec failed.\n");
+		if(pid==0)
+		  exit(0);
+	      }
+
+
 	}
       else
 	wait(NULL); //Parent process
