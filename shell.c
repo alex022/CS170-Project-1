@@ -11,9 +11,10 @@
 #define OUT 3
 #define IN 4
 
-int argCount(char*);
+//int argCount(char*);
 void parse(char*);
 void op(char **, int, char**);
+void split(char*, char**, int*, char**);
 
 int main(void)
 {  
@@ -33,7 +34,7 @@ int main(void)
       if(strcmp(input, "exit\n")==0)
 	exit(0);
        
-      command = split(input, commands, &delim, &strptr);
+      split(input, commands, &delim, &strptr);
       if(strcmp(*commands, "cd") == 0)
 	{
 	  chdir(commands[1]);
@@ -42,10 +43,6 @@ int main(void)
 	op(commands, delim, &strptr);
     }
 
-
-
-
-    
   /* char input[CLENGTH];
   char* path = "/bin/";
   char pipe[100][100]; 
@@ -114,7 +111,7 @@ int main(void)
   return 0;
 }
 
-int split(char* input, char* commands[], int *delim, char **strptr)
+void split(char* input, char* commands[], int *delim, char **strptr)
 {
   int command = 0;
   int end = 0;
@@ -178,7 +175,7 @@ int split(char* input, char* commands[], int *delim, char **strptr)
   }
 
   *commands = '\0';
-  return command;
+  //return command;
 }
 
 
@@ -193,7 +190,7 @@ void parse(char *strptr)
 void op(char** commands, int delim, char** strptr)
 {
 
-  pid_t pid, pidx;
+  int pid, pidx;
   FILE *fp;
   int m = NONE;
   int command;
@@ -201,8 +198,8 @@ void op(char** commands, int delim, char** strptr)
   char *commandsx[CLENGTH];
   char* strptrx = NULL;
   int Pipe[2];
-  
-  if(m==PIPE)
+
+  if(delim==PIPE)
     {
       if(pipe(Pipe))
 	{
@@ -230,7 +227,7 @@ void op(char** commands, int delim, char** strptr)
 	  fp = fopen(*strptr, "r");
 	  dup2(fileno(fp), 0);
 	}
-      if(m==PIPE)
+      if(delim==PIPE)
 	{
 	  close(Pipe[0]);
 	  dup2(Pipe[1], fileno(stdout));
@@ -243,17 +240,17 @@ void op(char** commands, int delim, char** strptr)
     }
   else
     {
-      if(m==BACKGROUND);
-      else if(m==PIPE)
+      if(delim==BACKGROUND);
+      else if(delim==PIPE)
 	{
-	  waitpid(pid, &status, 0);
+	  wait(&status);
 	  pidx = fork();
-	  if(pidx < 0)
+	  /*if(pidx < 0)
 	    {
 	      printf("ERROR: Fork failed.\n");
 	      exit(-1);
 	    }
-	  else if(pidx==0)
+	    else*/ if(pidx==0)
 	    {
 	      close(Pipe[1]);
 	      dup2(Pipe[0], fileno(stdin));
@@ -264,16 +261,16 @@ void op(char** commands, int delim, char** strptr)
 	    }
 	  else
 	    {
-	       wait(NULL);
-	       waitpid(pid, &status, 0);
-	       waitpid(pidx, &statusx, 0);
+	      //wait(NULL);
+	      //waitpid(pid, &status, 0);
+	      //waitpid(pidx, &statusx, 0);
 	      close(Pipe[0]);
 	      close(Pipe[1]);
 	    }
 
 	}
       else
-	waitpid(pid, &status, 0);
+	wait(&status);
         wait(NULL);
     }
 }
