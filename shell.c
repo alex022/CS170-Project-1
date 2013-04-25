@@ -33,11 +33,19 @@ int main(void)
       if(strcmp(input, "exit\n")==0)
 	exit(0);
        
+      if(feof(stdin))
+	{
+	  printf("\n");
+	  exit(0);
+	}
+
       split(input, commands, &delim, &strptr);
       if(strcmp(*commands, "cd") == 0)
 	{
 	  chdir(commands[1]);
-	}
+	} 
+      
+
       else
 	{
 	  int pid, pidx;
@@ -51,12 +59,13 @@ int main(void)
 
 	  if(delim==PIPE)
 	    {
+	      printf("hit\n");
 	      if(pipe(Pipe))
 		{
 		  printf("ERROR: Exec failed.\n");
 		  exit(-1);
 		}
-	      split(strptr, commandsx, &m, &strptrx);
+	       split(strptr, commandsx, &m, &strptrx);
 	    }
 
 	  pid = fork();
@@ -71,28 +80,36 @@ int main(void)
 		{
 		  fp = fopen(strptr, "w+");
 		  dup2(fileno(fp), 1);	
+		  //	  split(strptr, commandsx, &m, &strptrx);
 		}
 	      if(delim==IN)
 		{
 		  fp = fopen(strptr, "r");
 		  dup2(fileno(fp), 0);
+		  //  split(strptr, commandsx, &m, &strptrx);
 		}
 	      if(delim==PIPE)
 		{
 		  close(Pipe[0]);
 		  dup2(Pipe[1], fileno(stdout));
 		  close(Pipe[1]);
+		  //  split(strptr, commandsx, &m, &strptrx);
 		}
-
+	      
 	      int rv = execvp(*commands, commands);
+	      
 	      if(rv==-1)
+		{
 		printf("ERROR: Exec failed.\n");
+		exit(-1);
+		}
 	    }
 	  else
 	    {
 	      if(delim==BACKGROUND);
 	      else if(delim==PIPE)
 		{
+		  printf("PIIIIIIPE\n");
 		  wait(&status);
 		  pidx = fork();
 		  if(pidx==0)
@@ -102,7 +119,10 @@ int main(void)
 		      close(Pipe[0]);
 		      int rv = execvp(*commandsx, commandsx);
 		      if(rv==-1)
-			printf("ERROR: Exec failed.\n");
+			{
+			  printf("ERROR: Exec failed.\n");
+			  exit(-1);
+			}		
 		    }
 		  else
 		    {
@@ -165,13 +185,13 @@ void split(char* input, char* commands[], int *delim, char **strptr)
 	      while(*sptr == ' ')
 		sptr++;
 
-	      *strptr = sptr;
-	      end = 1;	      
-	    }	    
+	      *strptr = sptr;	     
+	       end = 1;	      
+	    }      
 	  
 	  if(*sptr == '&')
 	    *delim = BACKGROUND;
-	
+
 	  sptr++;
 	}
       while(((*sptr == ' ') || (*sptr == '\n')) && (!end))
